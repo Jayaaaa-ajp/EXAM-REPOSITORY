@@ -1,144 +1,36 @@
 <?php
+
 include "config.php";
-
 $id = $_GET['id'];
-$type = $_GET['type'];
-
-// ================= UPDATE PROCESS =================
 if(isset($_POST['update'])){
 
-    if($_POST['type']=="customer"){
-        $conn->query("UPDATE customers SET 
-            first_name='{$_POST['first_name']}',
-            last_name='{$_POST['last_name']}',
-            phone='{$_POST['phone']}'
-            WHERE id={$_POST['id']}");
-        header("Location: customers.php");
-    }
+$doctor = $_POST['doctor_name'];
+$date = $_POST['consultation_date'];
+$diagnosis = $_POST['diagnosis'];
+$treatment = $_POST['treatment'];
+$sql = "UPDATE consultations SET
 
-    if($_POST['type']=="menu"){
-        $conn->query("UPDATE menu SET 
-            dish='{$_POST['dish']}',
-            category='{$_POST['category']}',
-            price='{$_POST['price']}'
-            WHERE id={$_POST['id']}");
-        header("Location: menu.php");
-    }
+doctor_name='$doctor',
+consultation_date='$date',
+diagnosis='$diagnosis',
+treatment='$treatment'
 
-    if($_POST['type']=="order"){
-        $price = $conn->query("SELECT price FROM menu WHERE id={$_POST['menu_id']}")->fetch_assoc();
-        $total = $price['price'] * $_POST['quantity'];
+WHERE consultation_id='$id'";
 
-        $conn->query("UPDATE orders SET 
-            customer_id='{$_POST['customer_id']}',
-            menu_id='{$_POST['menu_id']}',
-            quantity='{$_POST['quantity']}',
-            total='$total'
-            WHERE id={$_POST['id']}");
-        header("Location: orders.php");
-    }
+$conn->query($sql);
+header("Location: landing.php");
+
 }
 
-// ================= LOAD DATA =================
-if($type=="customer"){
-    $data = $conn->query("SELECT * FROM customers WHERE id=$id")->fetch_assoc();
-}
+$data = $conn->query("SELECT * FROM consultations WHERE consultation_id='$id'");
+$row = $data->fetch_assoc();
 
-if($type=="menu"){
-    $data = $conn->query("SELECT * FROM menu WHERE id=$id")->fetch_assoc();
-}
-
-if($type=="order"){
-    $data = $conn->query("SELECT * FROM orders WHERE id=$id")->fetch_assoc();
-    $customers = $conn->query("SELECT * FROM customers");
-    $menu = $conn->query("SELECT * FROM menu");
-}
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-<title>Update</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-body{
-    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-    color:white;
-}
-.card{
-    background:#1c2b4a;
-    border:1px solid #00d4ff;
-}
-</style>
-</head>
-<body class="container py-5">
-
-<div class="card p-4">
-
-<h3 class="mb-4">Update <?= ucfirst($type) ?></h3>
-
-<form method="POST">
-<input type="hidden" name="id" value="<?= $id ?>">
-<input type="hidden" name="type" value="<?= $type ?>">
-
-<?php if($type=="customer"): ?>
-
-<input type="text" name="first_name" class="form-control mb-3"
-value="<?= $data['first_name'] ?>" required>
-
-<input type="text" name="last_name" class="form-control mb-3"
-value="<?= $data['last_name'] ?>" required>
-
-<input type="text" name="phone" class="form-control mb-3"
-value="<?= $data['phone'] ?>" required>
-
-<?php endif; ?>
-
-
-<?php if($type=="menu"): ?>
-
-<input type="text" name="dish" class="form-control mb-3"
-value="<?= $data['dish'] ?>" required>
-
-<input type="text" name="category" class="form-control mb-3"
-value="<?= $data['category'] ?>" required>
-
-<input type="number" step="0.01" name="price" class="form-control mb-3"
-value="<?= $data['price'] ?>" required>
-
-<?php endif; ?>
-
-
-<?php if($type=="order"): ?>
-
-<select name="customer_id" class="form-control mb-3" required>
-<?php while($c=$customers->fetch_assoc()): ?>
-<option value="<?= $c['id'] ?>"
-<?= $c['id']==$data['customer_id']?'selected':'' ?>>
-<?= $c['first_name']." ".$c['last_name'] ?>
-</option>
-<?php endwhile; ?>
-</select>
-
-<select name="menu_id" class="form-control mb-3" required>
-<?php while($m=$menu->fetch_assoc()): ?>
-<option value="<?= $m['id'] ?>"
-<?= $m['id']==$data['menu_id']?'selected':'' ?>>
-<?= $m['dish'] ?> - ₱<?= $m['price'] ?>
-</option>
-<?php endwhile; ?>
-</select>
-
-<input type="number" name="quantity" class="form-control mb-3"
-value="<?= $data['quantity'] ?>" required>
-
-<?php endif; ?>
-
-<button name="update" class="btn btn-info w-100">Update</button>
+<form method="POST">Doctor Name
+<input type="text" name="doctor_name" value="<?php echo $row['doctor_name']; ?>">Date
+<input type="date" name="consultation_date" value="<?php echo $row['consultation_date']; ?>">Diagnosis
+<input type="text" name="diagnosis" value="<?php echo $row['diagnosis']; ?>">Treatment
+<input type="text" name="treatment" value="<?php echo $row['treatment']; ?>">
+<button name="update">Update</button>
 
 </form>
-
-</div>
-
-</body>
-</html>
