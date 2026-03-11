@@ -1,7 +1,14 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "restaurant");
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+$host = "localhost";
+$user = "root";
+$password = "";
+$database = "pareja_labexam1";
+
+$conn = new mysqli($host, $user, $password, $database);
+
+if($conn->connect_error){
+    die("Connection Failed: " . $conn->connect_error);
 }
+
 ?>
