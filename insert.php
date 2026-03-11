@@ -1,26 +1,21 @@
 <?php
+
 include "config.php";
 
-$type = $_POST['type'];
+$patient_id = $_POST['patient_id'];
+$doctor = $_POST['doctor_name'];
+$date = $_POST['consultation_date'];
+$diagnosis = $_POST['diagnosis'];
+$treatment = $_POST['treatment'];
 
-if($type=="customer"){
-    $conn->query("INSERT INTO customers(first_name,last_name,phone)
-    VALUES('{$_POST['first_name']}','{$_POST['last_name']}','{$_POST['phone']}')");
-    header("Location: customers.php");
-}
+$sql = "INSERT INTO consultations 
+(patient_id, doctor_name, consultation_date, diagnosis, treatment)
 
-if($type=="menu"){
-    $conn->query("INSERT INTO menu(dish,category,price)
-    VALUES('{$_POST['dish']}','{$_POST['category']}','{$_POST['price']}')");
-    header("Location: menu.php");
-}
+VALUES 
+('$patient_id','$doctor','$date','$diagnosis','$treatment')";
 
-if($type=="order"){
-    $menu = $conn->query("SELECT price FROM menu WHERE id={$_POST['menu_id']}")->fetch_assoc();
-    $total = $menu['price'] * $_POST['quantity'];
+$conn->query($sql);
 
-    $conn->query("INSERT INTO orders(customer_id,menu_id,quantity,total)
-    VALUES('{$_POST['customer_id']}','{$_POST['menu_id']}','{$_POST['quantity']}','$total')");
-    header("Location: orders.php");
-}
+header("Location: landing.php");
+
 ?>
